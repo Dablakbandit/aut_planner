@@ -77,8 +77,25 @@ public class AutPlanner{
 		// Calculate in 24 hour clock
 		int latest = input != 12 ? 12 + input : input;
 		
+		// Ask user question
+		System.out.println("City/South/Both? (C/S/B) ");
+		
+		char loc = reader.next().charAt(0);
+		
+		Location l = Location.BOTH;
+		switch(loc){
+		case 'C':
+		case 'c':
+			l = Location.CITY;
+			break;
+		case 'S':
+		case 's':
+			l = Location.SOUTH;
+			break;
+		}
+		
 		// Create list for removal
-		List<Timetable> remove = new ArrayList<Timetable>();
+		Set<Timetable> remove = new HashSet<Timetable>();
 		
 		// For each timetable
 		for(Timetable timetable : timetables){
@@ -88,6 +105,24 @@ public class AutPlanner{
 				if(c.getEnd() > latest){
 					// Add to remove list
 					remove.add(timetable);
+				}else{
+					// Switch Location
+					switch(l){
+					case CITY:
+						// Not city
+						if(!c.getRoom().startsWith("W")){
+							// Add to remove list
+							remove.add(timetable);
+						}
+						break;
+					case SOUTH:
+						// Not south
+						if(!c.getRoom().startsWith("M")){
+							// Add to remove list
+							remove.add(timetable);
+						}
+						break;
+					}
 				}
 			}
 		}
@@ -109,6 +144,8 @@ public class AutPlanner{
 	public void printToFile(List<Timetable> timetables){
 		// The file we want to write to
 		File f = new File(".", "out.csv");
+		// Print file name
+		System.out.println(f.getAbsolutePath());
 		// If file exists
 		if(f.exists()){
 			// Delete file
@@ -300,7 +337,7 @@ public class AutPlanner{
 						end += 12;
 					}
 					// Add class to Stream
-					s.getClasses().add(new Class(s.getCode(), day, start, end));
+					s.getClasses().add(new Class(s.getCode(), tds.get(6).text(), day, start, end));
 				}
 			}
 			// If Stream isnt null
