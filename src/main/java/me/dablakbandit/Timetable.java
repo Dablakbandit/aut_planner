@@ -25,6 +25,16 @@ public class Timetable{
 		return true;
 	}
 	
+	public List<String> getUnique(){
+		List<String> list = new ArrayList<String>();
+		for(Class c : classes){
+			if(!list.contains(c.getCode())){
+				list.add(c.getCode());
+			}
+		}
+		return list;
+	}
+	
 	public Timetable clone(){
 		Timetable tt = new Timetable();
 		tt.classes.addAll(classes);

@@ -37,8 +37,12 @@ public class Class{
 	public boolean collides(Class check){
 		if(day != check.day){ return false; }
 		if(check.start == start){ return true; }
-		if(check.start > end || end > check.start){ return false; }
+		if(check.start >= end || end >= check.start){ return false; }
 		return true;
+	}
+	
+	public void print(){
+		System.out.println(day + " : " + start + " - " + end);
 	}
 	
 }
