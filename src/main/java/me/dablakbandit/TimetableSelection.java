@@ -25,7 +25,7 @@ public class TimetableSelection extends JFrame{
 	private JButton			btnAdd;
 	private JComboBox		boxSelected;
 	private JButton			btnRemove;
-	private JButton			button1;
+	private JButton			btnBefore;
 	private List<Timetable>	allTimetables;
 	private List<Timetable>	filteredTimetables	= new ArrayList<>();
 	private int				index				= 0;
@@ -77,6 +77,15 @@ public class TimetableSelection extends JFrame{
 			public void actionPerformed(ActionEvent e){
 				boxSelected.removeItem(boxSelected.getSelectedItem());
 				update();
+			}
+		});
+		btnBefore.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e){
+				if(index > 0){
+					index--;
+				}
+				showTimetable();
 			}
 		});
 	}
@@ -168,9 +177,9 @@ public class TimetableSelection extends JFrame{
 		panel1.add(	btnRemove,
 					new com.intellij.uiDesigner.core.GridConstraints(	4, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL,
 																		com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-		button1 = new JButton();
-		button1.setText("Button");
-		panel1.add(	button1,
+		btnBefore = new JButton();
+		btnBefore.setText("Button");
+		panel1.add(	btnBefore,
 					new com.intellij.uiDesigner.core.GridConstraints(	6, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL,
 																		com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
 		final JPanel panel2 = new JPanel();
