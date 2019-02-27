@@ -1,16 +1,22 @@
+/*
+ * Copyright (c) 2019 Ashley Thew
+ */
+
 package me.dablakbandit;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import me.dablakbandit.util.Campus;
+
 public class Stream{
 	
 	private String		code;
+	private Campus		campus;
 	private List<Class>	classes	= new ArrayList<Class>();
 	
 	public Stream(String code){
 		this.code = code;
-		// System.out.println(code + ":" + code.length());
 	}
 	
 	public String getCode(){
@@ -20,4 +26,25 @@ public class Stream{
 	public List<Class> getClasses(){
 		return classes;
 	}
+	
+	public Campus getCampus(){
+		return campus;
+	}
+	
+	public void setCampus(Campus campus){
+		this.campus = campus;
+	}
+	
+	public boolean isValidCampus(Campus campus){
+		return this.campus.getCode().startsWith(campus.getCode());
+	}
+	
+	public String toString(){
+		String to = campus.name() + " " + code;
+		for(Class c : classes){
+			to += "\n" + c.toString();
+		}
+		return to;
+	}
+	
 }

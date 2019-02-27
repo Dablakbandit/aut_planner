@@ -1,143 +1,237 @@
+/*
+ * Copyright (c) 2019 Ashley Thew
+ */
+
 package me.dablakbandit;
 
+import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.PrintWriter;
 import java.util.*;
+
+import javax.swing.*;
+import javax.swing.Timer;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import me.dablakbandit.util.Location;
+
 public class AutPlanner{
+	
+	private static AutPlanner autPlanner;
+	
+	public static AutPlanner getInstance(){
+		return autPlanner;
+	}
 	
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args){
-		new AutPlanner();
+	public static void main(String[] args) throws ClassNotFoundException, UnsupportedLookAndFeelException, InstantiationException, IllegalAccessException{
+		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		autPlanner = new AutPlanner();
+	}
+	
+	public void showMessageBox(String message, Runnable runnable){
+		showMessageBox(message, 1, runnable);
+	}
+	
+	public void showMessageBox(String message, int length, Runnable runnable){
+		SwingUtilities.invokeLater(() -> {
+			final JOptionPane optionPane = new JOptionPane(message, JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION, null, new Object[]{}, null);
+			
+			final JDialog dialog = new JDialog();
+			dialog.setTitle("AUT Planner");
+			dialog.setModal(true);
+			dialog.setContentPane(optionPane);
+			dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+			dialog.pack();
+			
+			Timer timer = new Timer(length, new AbstractAction(){
+				@Override
+				public void actionPerformed(ActionEvent ae){
+					runnable.run();
+					dialog.dispose();
+				}
+			});
+			timer.setRepeats(false);
+			timer.start();
+			
+			dialog.setLocationRelativeTo(null);
+			dialog.setVisible(true);
+		});
+	}
+	
+	protected void showPlanner(){
+		SwingUtilities.invokeLater(() -> {
+			SelectionGUI p = new SelectionGUI();
+			p.setVisible(true);
+		});
+	}
+	
+	protected void showTimetable(List<Timetable> timetables){
+		SwingUtilities.invokeLater(() -> {
+			TimetableSelection p = new TimetableSelection(timetables);
+			p.setVisible(true);
+		});
+	}
+	
+	protected void showLoading(Runnable runnable){
+		showMessageBox("Loading...", runnable);
+	}
+	
+	protected List<Specialisation> specialisations = new ArrayList<Specialisation>();
+	
+	public List<Specialisation> getSpecialisations(){
+		return specialisations;
+	}
+	
+	protected void loadSpecialistions(){
+		try{
+			// Get data from url
+			Document doc = Jsoup.connect("https://arion.aut.ac.nz/ArionMain/CourseInfo/Information/Qualifications/Subjects.aspx").get();
+			Elements navigations = doc.getElementsByClass("Navigation");
+			for(Element navigation : navigations){
+				String specialisation = navigation.text();
+				String url = "https://arion.aut.ac.nz/ArionMain/CourseInfo/Information/Qualifications/" + navigation.attr("href");
+				System.out.println("Found: " + specialisation);
+				specialisations.add(new Specialisation(specialisation, url));
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 	}
 	
 	private AutPlanner(){
-		// Scanner for reading input from user
-		Scanner reader = new Scanner(System.in);
-		
-		// Get codes for our course at a specicified level
-		// This should be doable with any course
-		List<Paper> papers = getCodes("https://arion.aut.ac.nz/ArionMain/CourseInfo/Information/Qualifications/PaperTable.aspx?id=3765", "Level 5");
-		
-		// List of all possible streams
-		List<List<Stream>> all_streams = new ArrayList<List<Stream>>();
-		
-		// For each paper
-		for(Paper paper : papers){
-			// Ask user question
-			System.out.println("Are you taking " + paper.getName() + "? (y/n) ");
-			// Get input from user
-			char input = reader.next().charAt(0);
-			// If is taking paper
-			if(input == 'y'){
-				// Get possible semesters
-				Map<String, Element> times = getTimetables(paper.getUrl());
+		if(true){
+			showLoading(() -> {
+				loadSpecialistions();
+				showPlanner();
+			});
+		}else{
+			// Scanner for reading input from user
+			Scanner reader = new Scanner(System.in);
+			
+			// Get codes for our course at a specicified level
+			// This should be doable with any course
+			List<Paper> papers = getCodes("https://arion.aut.ac.nz/ArionMain/CourseInfo/Information/Qualifications/PaperTable.aspx?id=3765", "Level 5");
+			
+			// List of all possible streams
+			List<List<Stream>> all_streams = new ArrayList<List<Stream>>();
+			
+			// For each paper
+			for(Paper paper : papers){
 				// Ask user question
-				System.out.println("Which semester? ");
-				// Counter for question
-				int i = 1;
-				// For each semester
-				for(Map.Entry<String, Element> t : times.entrySet()){
-					// Print semester
-					System.out.println(i++ + ") " + t.getKey());
-				}
+				System.out.println("Are you taking " + paper.getName() + "? (y/n) ");
 				// Get input from user
-				int sem = reader.nextInt();
-				// Counter for check
-				int k = 0;
-				for(Map.Entry<String, Element> t : times.entrySet()){
-					// Add to counter
-					k++;
-					// If is the same as user input
-					if(k == sem){
-						// Get classes for that semester
-						List<Stream> streams = getClasses(t.getValue());
-						// Add to out list of all possible
-						all_streams.add(streams);
+				char input = reader.next().charAt(0);
+				// If is taking paper
+				if(input == 'y'){
+					// Get possible semesters
+					Map<String, Element> times = getTimetables(paper.getUrl());
+					// Ask user question
+					System.out.println("Which semester? ");
+					// Counter for question
+					int i = 1;
+					// For each semester
+					for(Map.Entry<String, Element> t : times.entrySet()){
+						// Print semester
+						System.out.println(i++ + ") " + t.getKey());
+					}
+					// Get input from user
+					int sem = reader.nextInt();
+					// Counter for check
+					int k = 0;
+					for(Map.Entry<String, Element> t : times.entrySet()){
+						// Add to counter
+						k++;
+						// If is the same as user input
+						if(k == sem){
+							// Get classes for that semester
+							List<Stream> streams = getClasses(t.getValue());
+							// Add to out list of all possible
+							all_streams.add(streams);
+						}
 					}
 				}
 			}
-		}
-		
-		// Generate possible timetables
-		List<Timetable> timetables = getPossibleTimetables(all_streams);
-		
-		// Ask user question
-		System.out.println("What is the latest time u want to stay at uni? (pm) ");
-		
-		int input = reader.nextInt();
-		
-		// Calculate in 24 hour clock
-		int latest = input != 12 ? 12 + input : input;
-		
-		// Ask user question
-		System.out.println("City/South/Both? (C/S/B) ");
-		
-		char loc = reader.next().charAt(0);
-		
-		Location l = Location.BOTH;
-		switch(loc){
-		case 'C':
-		case 'c':
-			l = Location.CITY;
-			break;
-		case 'S':
-		case 's':
-			l = Location.SOUTH;
-			break;
-		}
-		
-		// Create list for removal
-		Set<Timetable> remove = new HashSet<Timetable>();
-		
-		// For each timetable
-		for(Timetable timetable : timetables){
-			// For each class in the timetable
-			for(Class c : timetable.getClasses()){
-				// If ends later than we want
-				if(c.getEnd() > latest){
-					// Add to remove list
-					remove.add(timetable);
-				}else{
-					// Switch Location
-					switch(l){
-					case CITY:
-						// Not city
-						if(!c.getRoom().startsWith("W")){
-							// Add to remove list
-							remove.add(timetable);
+			
+			// Generate possible timetables
+			List<Timetable> timetables = getPossibleTimetables(all_streams);
+			
+			// Ask user question
+			System.out.println("What is the latest time u want to stay at uni? (pm) ");
+			
+			int input = reader.nextInt();
+			
+			// Calculate in 24 hour clock
+			int latest = input != 12 ? 12 + input : input;
+			
+			// Ask user question
+			System.out.println("City/South/Both? (C/S/B) ");
+			
+			char loc = reader.next().charAt(0);
+			
+			Location l = Location.BOTH;
+			switch(loc){
+			case 'C':
+			case 'c':
+				l = Location.CITY;
+				break;
+			case 'S':
+			case 's':
+				l = Location.SOUTH;
+				break;
+			}
+			
+			// Create list for removal
+			Set<Timetable> remove = new HashSet<Timetable>();
+			
+			// For each timetable
+			for(Timetable timetable : timetables){
+				// For each class in the timetable
+				for(Class c : timetable.getClasses()){
+					// If ends later than we want
+					if(c.getEnd() > latest){
+						// Add to remove list
+						remove.add(timetable);
+					}else{
+						// Switch Location
+						switch(l){
+						case CITY:
+							// Not city
+							if(!c.getRoom().startsWith("W")){
+								// Add to remove list
+								remove.add(timetable);
+							}
+							break;
+						case SOUTH:
+							// Not south
+							if(!c.getRoom().startsWith("M")){
+								// Add to remove list
+								remove.add(timetable);
+							}
+							break;
 						}
-						break;
-					case SOUTH:
-						// Not south
-						if(!c.getRoom().startsWith("M")){
-							// Add to remove list
-							remove.add(timetable);
-						}
-						break;
 					}
 				}
 			}
+			
+			// Remove all unwanted from timetables
+			timetables.removeAll(remove);
+			
+			// Close scanner
+			reader.close();
+			
+			// Print timetables to file
+			printToFile(timetables);
+			
+			// Print amount written to file out of possible
+			System.out.println("Printed " + timetables.size() + "/" + getTotal(all_streams) + " possible timetables to file.");
 		}
-		
-		// Remove all unwanted from timetables
-		timetables.removeAll(remove);
-		
-		// Close scanner
-		reader.close();
-		
-		// Print timetables to file
-		printToFile(timetables);
-		
-		// Print amount written to file out of possible
-		System.out.println("Printed " + timetables.size() + "/" + getTotal(all_streams) + " possible timetables to file.");
 	}
 	
 	// Method to print timetables to file
@@ -169,9 +263,9 @@ public class AutPlanner{
 					}
 				}
 				// Get the lowest hour in timetable
-				int min_hour = getLowestHour(w);
+				int min_hour = w.getLowestHour();
 				// Get the highest hour in timetable
-				int max_hour = getMaxHour(w);
+				int max_hour = w.getMaxHour();
 				// For each hour in timetable
 				for(int hour = min_hour; hour < max_hour; hour++){
 					// Calculate hour to print
@@ -201,30 +295,6 @@ public class AutPlanner{
 		}catch(Exception e){
 			e.printStackTrace();
 		}
-	}
-	
-	// Method to get the lowest hour from a timetable
-	public int getLowestHour(Timetable w){
-		// Init low to highest number
-		int low = 24;
-		// For each class
-		for(Class c : w.getClasses()){
-			// Reassign low to the lowest
-			low = Math.min(low, c.getStart());
-		}
-		return low;
-	}
-	
-	// Method to get the highest hour from a timetable
-	public int getMaxHour(Timetable w){
-		// Init max to lowest number
-		int max = 0;
-		// For each class
-		for(Class c : w.getClasses()){
-			// Reassign max to the highest
-			max = Math.max(max, c.getEnd());
-		}
-		return max;
 	}
 	
 	// Returns the total amount timetables

@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2019 Ashley Thew
+ */
+
 package me.dablakbandit;
 
 public class Class{
@@ -11,7 +15,6 @@ public class Class{
 		this.day = day;
 		this.start = start;
 		this.end = end;
-		// System.out.println(day + " : " + start + " : " + end);
 	}
 	
 	public int getDay(){
@@ -42,7 +45,11 @@ public class Class{
 	}
 	
 	public void print(){
-		System.out.println(day + " : " + start + " - " + end);
+		System.out.println(toString());
+	}
+	
+	public String toString(){
+		return day + " : " + start + " - " + end;
 	}
 	
 }
