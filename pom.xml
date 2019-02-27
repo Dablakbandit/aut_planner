@@ -6,7 +6,7 @@
 
     <groupId>me.dablakbandit</groupId>
     <artifactId>aut_planner</artifactId>
-    <version>0.0.1</version>
+    <version>0.0.2</version>
 
     <name>aut_planner</name>
 
@@ -79,15 +79,32 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>2.4.1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <shadedArtifactAttached>false</shadedArtifactAttached>
+                    <createDependencyReducedPom>true</createDependencyReducedPom>
+                    <minimizeJar>true</minimizeJar>
+                </configuration>
+            </plugin>
+            <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <version>1.8</version>
                 <executions>
                     <execution>
                         <id>copy</id>
-                        <phase>package</phase>
+                        <phase>install</phase>
                         <configuration>
                             <target>
-                                <copy file="${basedir}/target/${project.artifactId}-${project.version}-jar-with-dependencies.jar"
+                                <copy file="${basedir}/target/${project.artifactId}-${project.version}-shaded.jar"
                                       tofile="${basedir}/${project.artifactId}-latest.jar" overwrite="true"/>
                             </target>
                         </configuration>
