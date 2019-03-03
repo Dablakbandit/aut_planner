@@ -5,8 +5,6 @@
 package me.dablakbandit;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -66,59 +64,36 @@ public class TimetableSelection extends JFrame{
 		
 		update();
 		
-		nextButton.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e){
-				if(index < filteredTimetables.size() - 1){
-					index++;
-				}
-				showTimetable();
+		nextButton.addActionListener(e -> {
+			if(index < filteredTimetables.size() - 1){
+				index++;
 			}
+			showTimetable();
 		});
-		btnAdd.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e){
-				boxSelected.insertItemAt(boxPossibleStreams.getSelectedItem(), 0);
-				boxSelected.setSelectedIndex(0);
-				update();
+		btnAdd.addActionListener(e -> {
+			boxSelected.insertItemAt(boxPossibleStreams.getSelectedItem(), 0);
+			boxSelected.setSelectedIndex(0);
+			update();
+		});
+		btnRemove.addActionListener(e -> {
+			boxSelected.removeItem(boxSelected.getSelectedItem());
+			update();
+		});
+		btnBefore.addActionListener(e -> {
+			if(index > 0){
+				index--;
 			}
+			showTimetable();
 		});
-		btnRemove.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e){
-				boxSelected.removeItem(boxSelected.getSelectedItem());
-				update();
-			}
+		btnRemoveTimetable.addActionListener(e -> {
+			removedTimetables.add(filteredTimetables.get(index));
+			update();
 		});
-		btnBefore.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e){
-				if(index > 0){
-					index--;
-				}
-				showTimetable();
-			}
+		btnClear.addActionListener(e -> {
+			removedTimetables.clear();
+			update();
 		});
-		btnRemoveTimetable.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e){
-				removedTimetables.add(filteredTimetables.get(index));
-				update();
-			}
-		});
-		btnClear.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e){
-				removedTimetables.clear();
-				update();
-			}
-		});
-		btnExport.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e){
-				export();
-			}
-		});
+		btnExport.addActionListener(e -> export());
 	}
 	
 	public void update(){
@@ -168,10 +143,7 @@ public class TimetableSelection extends JFrame{
 		fc.addChoosableFileFilter(new FileNameExtensionFilter("CSV File", "csv"));
 		// In response to a button click:
 		int returnVal = fc.showOpenDialog(btnExport);
-		if(returnVal != JFileChooser.APPROVE_OPTION){
-			return;
-		}else{
-		}
+		if(returnVal != JFileChooser.APPROVE_OPTION){ return; }
 		// The file we want to write to
 		File f = fc.getSelectedFile();
 		// Print file name

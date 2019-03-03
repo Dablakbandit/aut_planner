@@ -40,8 +40,7 @@ public class Class{
 	public boolean collides(Class check){
 		if(day != check.day){ return false; }
 		if(check.start == start){ return true; }
-		if(check.start >= end || check.end <= start){ return false; }
-		return true;
+		return check.start < end && check.end > start;
 	}
 	
 	public void print(){

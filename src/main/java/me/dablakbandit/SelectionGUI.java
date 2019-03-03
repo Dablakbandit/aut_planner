@@ -5,8 +5,6 @@
 package me.dablakbandit;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -49,86 +47,65 @@ public class SelectionGUI extends JFrame{
 		for(Campus c : Campus.values()){
 			boxCampus.addItem(c);
 		}
-		btnSpecialisation.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e){
-				Specialisation s = (Specialisation)boxSpecialisation.getSelectedItem();
-				s.populateQualifications(boxQualification);
-			}
+		btnSpecialisation.addActionListener(e -> {
+			Specialisation s = (Specialisation)boxSpecialisation.getSelectedItem();
+			s.populateQualifications(boxQualification);
 		});
-		btnQualification.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e){
-				Course c = (Course)boxQualification.getSelectedItem();
-				c.populateLevel(boxLevel);
-			}
+		btnQualification.addActionListener(e -> {
+			Course c = (Course)boxQualification.getSelectedItem();
+			c.populateLevel(boxLevel);
 		});
-		btnLevel.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e){
-				Level l = (Level)boxLevel.getSelectedItem();
-				l.populate(boxClasses);
-			}
+		btnLevel.addActionListener(e -> {
+			Level l = (Level)boxLevel.getSelectedItem();
+			l.populate(boxClasses);
 		});
-		btnClasses.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e){
-				Paper paper = (Paper)boxClasses.getSelectedItem();
-				boxSelected.insertItemAt(boxClasses.getSelectedItem(), 0);
-				boxSelected.setSelectedIndex(0);
-				AutPlanner.getInstance().showMessageBox("Fetching Streams", () -> {
-					paper.getSemesters();
-					checkSemesters();
-				});
-			}
-		});
-		btnRemove.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e){
-				boxSelected.removeItem(boxSelected.getSelectedItem());
+		btnClasses.addActionListener(e -> {
+			Paper paper = (Paper)boxClasses.getSelectedItem();
+			boxSelected.insertItemAt(boxClasses.getSelectedItem(), 0);
+			boxSelected.setSelectedIndex(0);
+			AutPlanner.getInstance().showMessageBox("Fetching Streams", () -> {
+				paper.getSemesters();
 				checkSemesters();
-			}
+			});
 		});
-		btnCampus.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e){
-				String semester = (String)boxSemester.getSelectedItem();
-				Campus campus = (Campus)boxCampus.getSelectedItem();
-				for(int i = 0; i < boxSelected.getItemCount(); i++){
-					Paper paper = (Paper)boxSelected.getItemAt(i);
-					Semester sem = paper.getSemester(semester);
-					if(sem == null || !sem.hasCampus(campus)){
-						AutPlanner.getInstance().showMessageBox("Invalid campus", 2000, () -> {
-							
-						});
-						return;
-					}
-				}
-				AutPlanner.getInstance().showMessageBox("Valid campus", 1200, () -> {
-				});
-			}
+		btnRemove.addActionListener(e -> {
+			boxSelected.removeItem(boxSelected.getSelectedItem());
+			checkSemesters();
 		});
-		btnGenerate.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e){
-				String semester = (String)boxSemester.getSelectedItem();
-				List<Semester> semesters = new ArrayList<>();
-				for(int i = 0; i < boxSelected.getItemCount(); i++){
-					Paper paper = (Paper)boxSelected.getItemAt(i);
-					Semester sem = paper.getSemester(semester);
-					semesters.add(sem);
+		btnCampus.addActionListener(e -> {
+			String semester = (String)boxSemester.getSelectedItem();
+			Campus campus = (Campus)boxCampus.getSelectedItem();
+			for(int i = 0; i < boxSelected.getItemCount(); i++){
+				Paper paper = (Paper)boxSelected.getItemAt(i);
+				Semester sem = paper.getSemester(semester);
+				if(sem == null || !sem.hasCampus(campus)){
+					AutPlanner.getInstance().showMessageBox("Invalid campus", 2000, () -> {
+						
+					});
+					return;
 				}
-				Campus campus = (Campus)boxCampus.getSelectedItem();
-				List<List<Stream>> streams = new ArrayList<>();
-				for(Semester sem : semesters){
-					streams.add(sem.getStreams(campus));
-				}
-				
-				List<Timetable> timetables = getPossibleTimetables(streams);
-				
-				System.out.println("Found " + timetables.size() + "/" + getTotal(streams) + " possible timetables");
-				AutPlanner.getInstance().showTimetable(timetables);
 			}
+			AutPlanner.getInstance().showMessageBox("Valid campus", 1200, () -> {
+			});
+		});
+		btnGenerate.addActionListener(e -> {
+			String semester = (String)boxSemester.getSelectedItem();
+			List<Semester> semesters = new ArrayList<>();
+			for(int i = 0; i < boxSelected.getItemCount(); i++){
+				Paper paper = (Paper)boxSelected.getItemAt(i);
+				Semester sem = paper.getSemester(semester);
+				semesters.add(sem);
+			}
+			Campus campus = (Campus)boxCampus.getSelectedItem();
+			List<List<Stream>> streams = new ArrayList<>();
+			for(Semester sem : semesters){
+				streams.add(sem.getStreams(campus));
+			}
+			
+			List<Timetable> timetables = getPossibleTimetables(streams);
+			
+			System.out.println("Found " + timetables.size() + "/" + getTotal(streams) + " possible timetables");
+			AutPlanner.getInstance().showTimetable(timetables);
 		});
 	}
 	
