@@ -328,4 +328,5 @@ public class SelectionGUI extends JFrame{
 	public JComponent $$$getRootComponent$$$(){
 		return panel;
 	}
+	
 }

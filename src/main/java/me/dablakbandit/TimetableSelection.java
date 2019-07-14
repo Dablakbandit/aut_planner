@@ -285,4 +285,5 @@ public class TimetableSelection extends JFrame{
 	public JComponent $$$getRootComponent$$$(){
 		return panel;
 	}
+	
 }
