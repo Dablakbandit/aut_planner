@@ -26,6 +26,6 @@ public enum Campus{
 		for(Campus c : values()){
 			if(c.code.equals(check)){ return c; }
 		}
-		return null;
+		return Campus.City;
 	}
 }

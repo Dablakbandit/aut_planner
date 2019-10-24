@@ -108,6 +108,10 @@ public class Paper{
 									// New Stream
 									s = new Stream(stream);
 								}
+
+								if(tds.get(2).equals(tds.get(3))){
+									continue;
+								}
 								// Day of class
 								int day = Day.valueOf(tds.get(4).text().substring(0, 3)).ordinal() + 1;
 								// Get time for class

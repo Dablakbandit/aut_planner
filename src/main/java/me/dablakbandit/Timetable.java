@@ -5,7 +5,9 @@
 package me.dablakbandit;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Timetable{
 	
@@ -18,11 +20,19 @@ public class Timetable{
 	public List<Class> getClasses(){
 		return classes;
 	}
-	
+
+	private static Map<Stream, String> collides = new HashMap<>();
+
+	public static Map<Stream, String> getCollides() {
+		return collides;
+	}
+
 	public boolean tryAdd(Stream s){
 		for(Class c : classes){
 			for(Class c1 : s.getClasses()){
-				if(c.collides(c1)){ return false; }
+				if(c.collides(c1)){
+					collides.put(s, c.getCode());
+					return false; }
 			}
 		}
 		classes.addAll(s.getClasses());
